@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Open Day Companion App</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+<div class="container">
+  <!-- Login Form -->
+  <h1>Open Day App</h1>
+  <div id="login-section" class="login-form">
+    <h2>Please log in</h2>
+    <input type="text" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button class="btn" onclick="handleLogin()">Login</button>
+    <p><a href="#" onclick="openModal('forgotPasswordModal')">Forgot Password?</a></p>
+    <p>Don't have an account? <a href="#" onclick="openModal('createAccountModal')">Create Account</a></p>
+  </div>
+
+  <!-- Programme of the Day -->
+  <section id="programme" class="hidden">
+    <h2>Programme of the Day</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Event</th>
+          <th>Location</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>09:00 AM</td>
+          <td>Welcome & Registration</td>
+          <td>
+            <a href="https://maps.google.com/?q=University+of+Wolverhampton+Main+Entrance" target="_blank">
+              Main Entrance
+            </a>
+          </td>
+          <td>
+            <button class="btn" onclick="setReminder('Welcome & Registration at 09:00 AM')">Set Reminder</button>
+          </td>
+        </tr>
+        <tr>
+          <td>10:00 AM</td>
+          <td>Campus Tour</td>
+          <td>
+            <a href="https://maps.google.com/?q=University+of+Wolverhampton+Lobby" target="_blank">
+              Lobby
+            </a>
+          </td>
+          <td>
+            <button class="btn" onclick="setReminder('Campus Tour at 10:00 AM')">Set Reminder</button>
+          </td>
+        </tr>
+        <tr>
+          <td>11:00 AM</td>
+          <td>Library Visit</td>
+          <td>
+            <a href="https://maps.google.com/?q=University+of+Wolverhampton+Library" target="_blank">
+              Library
+            </a>
+          </td>
+          <td>
+            <button class="btn" onclick="setReminder('Library Visit at 11:00 AM')">Set Reminder</button>
+          </td>
+        </tr>
+        <tr>
+          <td>12:00 PM</td>
+          <td>Classroom MI102C</td>
+          <td>
+            <a href="https://maps.google.com/?q=University+of+Wolverhampton+Classroom+MI102C" target="_blank">
+              Classroom MI102C
+            </a>
+          </td>
+          <td>
+            <button class="btn" onclick="setReminder('Classroom MI102C at 12:00 PM')">Set Reminder</button>
+          </td>
+        </tr>
+        <tr>
+          <td>01:00 PM</td>
+          <td>Help Desk</td>
+          <td>
+            <a href="https://maps.google.com/?q=University+of+Wolverhampton+Help+Desk" target="_blank">
+              Help Desk
+            </a>
+          </td>
+          <td>
+            <button class="btn" onclick="setReminder('Help Desk at 01:00 PM')">Set Reminder</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- University of Wolverhampton Map -->
+  <div id="map" class="hidden">
+    <h2>University of Wolverhampton City Campus</h2>
+    <iframe 
+      width="100%" 
+      height="300"
+      src="https://maps.google.com/maps?q=University%20of%20Wolverhampton&t=&z=16&ie=UTF8&iwloc=&output=embed">
+    </iframe>
+  </div>
+
+  <!-- Nearby Places -->
+  <section id="nearby-places" class="hidden">
+    <h2>Nearby Hotels & Restaurants</h2>
+    <ul>
+      <li>
+        <a href="https://www.google.com/maps/search/?api=1&query=hotel+near+University+of+Wolverhampton" target="_blank">
+          Hotels Nearby
+        </a>
+      </li>
+      <li>
+        <a href="https://www.google.com/maps/search/?api=1&query=restaurant+near+University+of+Wolverhampton" target="_blank">
+          Restaurants Nearby
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Other Locations -->
+  <section id="other-locations" class="hidden">
+    <h2>Other Locations</h2>
+    <ul>
+      <li>
+        <a href="https://maps.google.com/?q=University+of+Wolverhampton+Library" target="_blank">
+          Library
+        </a>
+      </li>
+      <li>
+        <a href="https://maps.google.com/?q=University+of+Wolverhampton+Classroom+MI102C" target="_blank">
+          Classroom MI102C
+        </a>
+      </li>
+      <li>
+        <a href="https://maps.google.com/?q=University+of+Wolverhampton+Help+Desk" target="_blank">
+          Help Desk
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <!-- To-Do List -->
+  <section id="todo-list" class="hidden">
+    <h2>To-Do List</h2>
+    <ul id="reminder-list"></ul>
+  </section>
+</div>
+
+<!-- Create Account Modal -->
+<div id="createAccountModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('createAccountModal')">&times;</span>
+    <h2>Create Account</h2>
+    <input type="text" id="newEmail" placeholder="Email" />
+    <input type="password" id="newPassword" placeholder="Password" />
+    <button class="btn" onclick="createAccount()">Create Account</button>
+  </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div id="forgotPasswordModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('forgotPasswordModal')">&times;</span>
+    <h2>Forgot Password</h2>
+    <input type="text" id="resetEmail" placeholder="Enter your email" />
+    <button class="btn" onclick="resetPassword()">Reset Password</button>
+  </div>
+</div>
+
+<script>
+  /************************************************************
+   *  In-memory user storage for demonstration purposes ONLY  *
+   *  (Replace with localStorage, a database, or Firebase.)   *
+   ************************************************************/
+  let users = {}; 
+  let reminders = [];
+
+  // Show/hide modals
+  function openModal(id) {
+    document.getElementById(id).style.display = 'block';
+  }
+  function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  // Create an account
+  function createAccount() {
+    const email = document.getElementById('newEmail').value.trim();
+    const password = document.getElementById('newPassword').value.trim();
+
+    if (!email || !password) {
+      alert('Please enter an email and password.');
+      return;
+    }
+    if (users[email]) {
+      alert('Account already exists.');
+      return;
+    }
+    users[email] = password;
+    alert('Account created successfully!');
+    closeModal('createAccountModal');
+  }
+
+  // Handle login
+  function handleLogin() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (users[email] && users[email] === password) {
+      alert('Login successful!');
+      // Hide login section
+      document.getElementById('login-section').style.display = 'none';
+      // Show the hidden sections
+      showAllSections();
+    } else {
+      alert('Invalid email or password.');
+    }
+  }
+
+  // Reset password
+  function resetPassword() {
+    const email = document.getElementById('resetEmail').value.trim();
+    if (users[email]) {
+      const newPassword = prompt('Enter your new password:');
+      if (newPassword) {
+        users[email] = newPassword;
+        alert('Password reset successfully!');
+        closeModal('forgotPasswordModal');
+      }
+    } else {
+      alert('Email not found!');
+    }
+  }
+
+  // Show all sections after successful login
+  function showAllSections() {
+    document.getElementById('programme').classList.remove('hidden');
+    document.getElementById('map').classList.remove('hidden');
+    document.getElementById('todo-list').classList.remove('hidden');
+    document.getElementById('nearby-places').classList.remove('hidden');
+    document.getElementById('other-locations').classList.remove('hidden');
+  }
+
+  // Set a reminder
+  function setReminder(event) {
+    reminders.push(event);
+    updateReminderList();
+  }
+
+  // Update the reminder list
+  function updateReminderList() {
+    const list = document.getElementById('reminder-list');
+    list.innerHTML = reminders.map((item, index) => `
+      <li>
+        ${item} 
+        <button onclick="removeReminder(${index})" class="btn">Remove</button>
+      </li>
+    `).join('');
+  }
+
+  // Remove a reminder
+  function removeReminder(index) {
+    reminders.splice(index, 1);
+    updateReminderList();
+  }
+</script>
+</body>
+</html>
