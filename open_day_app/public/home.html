@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home - Open Day App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="container">
+  <h1>Welcome to the Open Day</h1>
+  <p id="welcome-message"></p>
+
+  <h2>Programme of the Day</h2>
+  <table id="event-table">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Event</th>
+        <th>Location</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Filled dynamically -->
+    </tbody>
+  </table>
+
+  <h2>Campus Map</h2>
+  <iframe 
+    width="100%" 
+    height="300"
+    src="https://maps.google.com/maps?q=University%20of%20Wolverhampton&t=&z=16&ie=UTF8&iwloc=&output=embed">
+  </iframe>
+
+  <h2>Nearby Places</h2>
+  <ul>
+    <li><a href="https://www.google.com/maps/search/?api=1&query=hotel+near+University+of+Wolverhampton" target="_blank">Hotels Nearby</a></li>
+    <li><a href="https://www.google.com/maps/search/?api=1&query=restaurant+near+University+of+Wolverhampton" target="_blank">Restaurants Nearby</a></li>
+  </ul>
+
+  <h2>Other Locations</h2>
+  <ul>
+    <li><a href="https://maps.google.com/?q=University+of+Wolverhampton+Library" target="_blank">Library</a></li>
+    <li><a href="https://maps.google.com/?q=University+of+Wolverhampton+Classroom+MI102C" target="_blank">Classroom MI102C</a></li>
+    <li><a href="https://maps.google.com/?q=University+of+Wolverhampton+Help+Desk" target="_blank">Help Desk</a></li>
+  </ul>
+
+  <button class="btn" onclick="goToTodo()">Go to My Reminders</button>
+  <button class="btn" onclick="logout()">Logout</button>
+
+</div>
+
+<script>
+  const userId = localStorage.getItem("user_id");
+  const email = localStorage.getItem("email");
+
+  if (!userId) {
+    alert("You are not logged in.");
+    window.location.href = "login.html";
+  }
+
+  document.getElementById("welcome-message").textContent = `Logged in as ${email}`;
+
+  function goToTodo() {
+    window.location.href = "todo.html";
+  }
+
+  function setReminder(eventId) {
+    fetch("../backend/reminders.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: userId, event_id: eventId })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        alert("Reminder set!");
+      } else {
+        alert("Failed to set reminder: " + (data.message || "Unknown error"));
+      }
+    })
+    .catch(err => {
+      console.error("Reminder error:", err);
+    });
+  }
+
+  fetch("../backend/events.php")
+    .then(res => res.json())
+    .then(data => {
+      const tableBody = document.querySelector("#event-table tbody");
+      tableBody.innerHTML = data.map(event => `
+        <tr>
+          <td>${event.event_time}</td>
+          <td>${event.event_name}</td>
+          <td><a href="${event.location_url}" target="_blank">${event.location}</a></td>
+          <td><button class="btn" onclick="setReminder(${event.event_id})">Set Reminder</button></td>
+        </tr>
+      `).join("");
+    })
+    .catch(err => {
+      console.error("Error fetching events:", err);
+    });
+    function logout() {
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("email");
+    window.location.href = "login.html";
+  }
+</script>
+
+</body>
+</html>

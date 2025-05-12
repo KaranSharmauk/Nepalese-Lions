@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register - Open Day App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="container">
+  <h1>Open Day App</h1>
+  <h2>Create Account</h2>
+
+  <input type="email" id="newEmail" placeholder="Email" required />
+  <input type="password" id="newPassword" placeholder="Password" required />
+  <button class="btn" onclick="register()">Register</button>
+
+  <p>Already have an account? <a href="login.html">Login here</a></p>
+</div>
+
+<script>
+  function register() {
+    const email = document.getElementById("newEmail").value.trim();
+    const password = document.getElementById("newPassword").value.trim();
+
+    if (!email || !password) {
+      alert("Please enter both email and password.");
+      return;
+    }
+
+    fetch("../backend/register.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        alert("Account created successfully!");
+        window.location.href = "login.html";
+      } else {
+        alert(data.message || "Failed to create account.");
+      }
+    })
+    .catch(err => {
+      console.error("Registration error:", err);
+      alert("An error occurred during registration.");
+    });
+  }
+</script>
+
+</body>
+</html>

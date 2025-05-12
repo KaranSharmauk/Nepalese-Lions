@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Open Day App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="container">
+  <h1>Open Day App</h1>
+  <h2>Login</h2>
+
+  <input type="email" id="email" placeholder="Email" required />
+  <input type="password" id="password" placeholder="Password" required />
+  <button class="btn" onclick="handleLogin()">Login</button>
+
+  <p><a href="reset_password.html">Forgot Password?</a></p>
+  <p>Don't have an account? <a href="register.html">Register here</a></p>
+</div>
+
+<script>
+  function handleLogin() {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+      alert("Please fill in both fields.");
+      return;
+    }
+
+    fetch("../backend/login.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        localStorage.setItem("user_id", data.user_id);
+        localStorage.setItem("email", email);
+        window.location.href = "home.html";
+      } else {
+        alert("Invalid credentials. Please try again.");
+      }
+    })
+    .catch(err => {
+      console.error("Login error:", err);
+      alert("An error occurred while trying to login.");
+    });
+  }
+</script>
+
+</body>
+</html>

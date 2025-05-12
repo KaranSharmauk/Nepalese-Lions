@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>To-Do List - Open Day App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="container">
+  <h1>To-Do List</h1>
+  <p id="user-email"></p>
+
+  <ul id="reminder-list" style="list-style-type: none; padding-left: 0;"></ul>
+
+  <button class="btn" onclick="goBack()">Back to Home</button>
+</div>
+
+<script>
+  const userId = localStorage.getItem("user_id");
+  const email = localStorage.getItem("email");
+
+  if (!userId) {
+    alert("You are not logged in.");
+    window.location.href = "login.html";
+  }
+
+  document.getElementById("user-email").textContent = `Logged in as ${email}`;
+
+  function loadReminders() {
+    fetch("../backend/reminders.php?user_id=" + userId)
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById("reminder-list");
+        if (data.length === 0) {
+          list.innerHTML = "<li>No reminders set.</li>";
+          return;
+        }
+
+        list.innerHTML = data.map(item => `
+          <li style="margin-bottom: 10px;">
+            <strong>${item.event_name}</strong> at ${formatTime(item.event_time)} — ${item.location}
+            <button class="btn" onclick="removeReminder(${item.reminder_id})">Remove</button>
+          </li>
+        `).join("");
+      })
+      .catch(err => {
+        console.error("Failed to load reminders", err);
+        alert("Could not load reminders.");
+      });
+  }
+
+  function removeReminder(reminderId) {
+    if (!confirm("Are you sure you want to remove this reminder?")) return;
+
+    fetch("../backend/reminders.php", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reminder_id: reminderId })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        loadReminders();
+      } else {
+        alert("Failed to remove reminder.");
+      }
+    })
+    .catch(err => {
+      console.error("Delete failed", err);
+    });
+  }
+
+  function goBack() {
+    window.location.href = "home.html";
+  }
+
+  function formatTime(time24) {
+    // Converts "13:00:00" to "1:00 PM"
+    const [hour, minute] = time24.split(":");
+    const h = +hour;
+    const ampm = h >= 12 ? "PM" : "AM";
+    const hour12 = h % 12 || 12;
+    return `${hour12}:${minute} ${ampm}`;
+  }
+
+  loadReminders();
+</script>
+
+</body>
+</html>
